@@ -3,7 +3,7 @@ const fs = require('fs');
 
 
 
-//Create a new sauce
+// créer une nouvelle sauce
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -16,21 +16,21 @@ exports.createSauce = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 }
 
-//Get one sauce
+// récupère une sauce
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => res.status(200).json(sauce))
     .catch(error => res.status(404).json({ error }));
 };
 
-// Get all the sauces
+// récupère toutes les sauces
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then(sauces => res.status(200).json(sauces))
     .catch(error => res.status(400).json({ error }));
 }
 
-//Modify one sauce
+// modifie une sauce 
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file ?
     {
@@ -42,7 +42,7 @@ exports.modifySauce = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
-//Delete one sauce
+// supprime une sauce
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
@@ -57,11 +57,11 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 
-//Like a sauce
+// like une sauce
 exports.likeSauce = (req, res, next) => {
   switch (req.body.like) {
     // Défault = 0
-    // Check that the user hasn't already liked the sauce
+    // check si l'utilisateur à déjà liker
     case 0:
       Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
@@ -74,7 +74,7 @@ exports.likeSauce = (req, res, next) => {
               .then(() => { res.status(201).json({ message: 'Ton avis a été pris en compte!' }); })
               .catch((error) => { res.status(400).json({ error: error }); });
 
-            // check that the user hasn't already diliked the sauce
+            // check si l'utilisateur à déjà dislike
           } if (sauce.usersDisliked.find(user => user === req.body.userId)) {
             Sauce.updateOne({ _id: req.params.id }, {
               $inc: { dislikes: -1 },
@@ -87,7 +87,7 @@ exports.likeSauce = (req, res, next) => {
         })
         .catch((error) => { res.status(404).json({ error: error }); });
       break;
-    //Updates likes. likes = 1 
+    // updates likes +1
     case 1:
       Sauce.updateOne({ _id: req.params.id }, {
         $inc: { likes: 1 },
@@ -98,7 +98,7 @@ exports.likeSauce = (req, res, next) => {
         .catch((error) => { res.status(400).json({ error: error }); });
       break;
 
-    //Updates dislikes. dislikes = -1
+    // ipdates dislikes -1
     case -1:
       Sauce.updateOne({ _id: req.params.id }, {
         $inc: { dislikes: 1 },
