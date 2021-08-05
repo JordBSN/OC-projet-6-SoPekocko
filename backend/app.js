@@ -1,7 +1,6 @@
 const express = require('express'); // framework basé sur node.js
 const mongoose = require('mongoose'); // pour se connecter à la data base de mongoose Db
 const path = require('path'); // permet l'uplaod d'image et de travailler avec les répertoires et chemins de fichiers
-const cors = require('cors'); // permet de fournir un middleware Connect / Express qui peut être utilisé pour activer CORS avec diverses options.
 const dotenv = require('dotenv').config(); // permet de masquer les informations de connexion à la base de données à l'aide de variables d'environnement
 const helmet = require('helmet'); // permet de protéger l'application de certaines vulnérabilités
 const session = require('cookie-session'); // permet de sécuriser les cookies
@@ -18,20 +17,17 @@ mongoose.connect(process.env.MONGO_URL,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
-
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 // middleware -------------------------------------------------------
-// CORS 
-app.use(cors())
- 
-app.get('/products/:id', function (req, res, next) {
-  res.json({msg: 'This is CORS-enabled for all origins!'})
-})
-
-app.listen(80, function () {
-  console.log('CORS-enabled web server listening on port 80')
-})
+// Configuration cors
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.AUTHORIZED_ORIGIN);
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+});
 
 // permet d'extraire l'objet JSON des requêtes POST 
 app.use(express.urlencoded({ extended: true }));
@@ -67,4 +63,4 @@ app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes)
 
 // Export de l'application express pour déclaration dans server.js -------------
-module.exports = app; 
+module.exports = app;
